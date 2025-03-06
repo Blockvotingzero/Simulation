@@ -1,0 +1,102 @@
+/* Custom styling */
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.election-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.election-card:hover {
+    transform: translateY(-5px);
+}
+
+.candidate-card {
+    border-left: 5px solid #007bff;
+    margin-bottom: 10px;
+}
+
+.vote-option {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vote-option:hover {
+    border-color: #007bff;
+    background-color: #f1f8ff;
+}
+
+.vote-option.selected {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.vote-count {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.result-bar {
+    height: 30px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.status-upcoming {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.status-active {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-ended {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.status-closed {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
