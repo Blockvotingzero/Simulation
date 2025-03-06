@@ -1,6 +1,6 @@
 // Configuration
 // Change this to your Render deployed API URL
-const API_BASE_URL = 'https://your-app-name.onrender.com/api';
+const API_BASE_URL = 'https://simulation-knyz.onrender.com/api';
 let adminKey = '';
 let currentElectionId = null;
 let resultsChart = null;
