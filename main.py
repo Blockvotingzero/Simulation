@@ -32,7 +32,7 @@ class Election(BaseModel):
 
 class Vote(BaseModel):
     election_id: int
-    candidate_index: int  # Now voting by candidate index
+    candidate_index: int  # Voting by candidate index instead of name
 
 @app.post("/api/election/create")
 async def create_election(election: Election):
