@@ -5,16 +5,16 @@ from datetime import datetime
 
 app = FastAPI()
 
-# ✅ CORS Setup - Allow frontend to access the backend
+# ✅ Proper CORS Setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (for testing)
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
 
-# In-memory storage for elections (simulating blockchain stacking)
+# In-memory storage for elections (simulating a blockchain)
 elections = []
 
 class Candidate(BaseModel):
@@ -41,8 +41,8 @@ async def create_election(election: Election):
         raise HTTPException(status_code=400, detail="End time must be after start time")
 
     election_id = len(elections)
-
-    # Store as dictionary to avoid serialization issues
+    
+    # Store as dictionary to prevent serialization issues
     elections.append({
         "id": election_id,
         "title": election.title,
@@ -57,12 +57,11 @@ async def create_election(election: Election):
 
 @app.get("/api/elections")
 async def get_elections():
-    """ Fetches all elections. """
     return {"elections": elections}
 
 @app.post("/api/vote")
 async def cast_vote(vote: Vote):
-    """ Allows a user to cast a vote using election ID and candidate index. """
+    """ Allows a user to cast a vote in an election. """
     if vote.election_id >= len(elections):
         raise HTTPException(status_code=404, detail="Election not found")
 
