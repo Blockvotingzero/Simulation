@@ -2,22 +2,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
-import hashlib
 
 app = FastAPI()
 
 # Enable CORS to allow frontend interaction
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (frontend access)
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],  # Explicitly allow GET, POST, OPTIONS
+    allow_methods=["GET", "POST", "OPTIONS"],  # Allow necessary HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
 
 # In-memory blockchain structure for elections
 elections = []
-votes = {}
 
 class Candidate(BaseModel):
     name: str
@@ -33,10 +31,8 @@ class Election(BaseModel):
     budget: float  # Amount to be spent on blockchain
 
 class Vote(BaseModel):
-    nin: str
-    secret_code: str
     election_id: int
-    candidate_name: str
+    candidate_index: int  # Now voting by candidate index
 
 @app.post("/api/election/create")
 async def create_election(election: Election):
@@ -47,7 +43,7 @@ async def create_election(election: Election):
     # Create election ID (sequential blockchain structure)
     election_id = len(elections)
     
-    # Store the election (immutable after creation)
+    # Store the election
     elections.append({
         "id": election_id,
         "title": election.title,
@@ -55,7 +51,7 @@ async def create_election(election: Election):
         "end_time": election.end_time,
         "candidates": election.candidates,
         "budget": election.budget,
-        "votes": {}
+        "votes": {}  # Dictionary to store votes
     })
 
     return {"message": "Election created", "election_id": election_id}
@@ -77,22 +73,17 @@ async def cast_vote(vote: Vote):
     if not (election["start_time"] <= current_time <= election["end_time"]):
         raise HTTPException(status_code=400, detail="Voting is not allowed at this time")
 
-    # Generate unique voter ID using NIN + secret code
-    voter_hash = hashlib.sha256(f"{vote.nin}-{vote.secret_code}".encode()).hexdigest()
+    # Ensure candidate index is valid
+    if vote.candidate_index < 0 or vote.candidate_index >= len(election["candidates"]):
+        raise HTTPException(status_code=400, detail="Invalid candidate index")
 
-    # Check if voter has already voted
-    if voter_hash in election["votes"]:
-        raise HTTPException(status_code=403, detail="Voter has already voted")
+    # Record the vote (using the index of the candidate)
+    candidate_name = election["candidates"][vote.candidate_index].name
+    if candidate_name not in election["votes"]:
+        election["votes"][candidate_name] = 0
+    election["votes"][candidate_name] += 1
 
-    # Ensure candidate exists
-    candidate_names = [c.name for c in election["candidates"]]
-    if vote.candidate_name not in candidate_names:
-        raise HTTPException(status_code=400, detail="Invalid candidate")
-
-    # Record the vote (permanently stored)
-    election["votes"][voter_hash] = vote.candidate_name
-
-    return {"message": "Vote casted successfully", "hash": voter_hash}
+    return {"message": "Vote cast successfully", "voted_for": candidate_name}
 
 @app.get("/api/election/{election_id}/results")
 async def get_results(election_id: int):
@@ -103,7 +94,7 @@ async def get_results(election_id: int):
 
     # Count votes per candidate
     results = {c.name: 0 for c in election["candidates"]}
-    for candidate in election["votes"].values():
-        results[candidate] += 1
+    for candidate, count in election["votes"].items():
+        results[candidate] += count
 
     return {"election_id": election_id, "title": election["title"], "results": results}
