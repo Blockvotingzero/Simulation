@@ -6,12 +6,12 @@ import hashlib
 
 app = FastAPI()
 
-# Enable CORS to allow frontend to interact with backend
+# Enable CORS to allow frontend interaction
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (frontend)
+    allow_origins=["*"],  # Allow all origins (frontend access)
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_methods=["GET", "POST", "OPTIONS"],  # Explicitly allow GET, POST, OPTIONS
     allow_headers=["*"],  # Allow all headers
 )
 
